@@ -6,10 +6,10 @@ const Select = dynamic(() => import('react-select'), {
   ssr: false,
 });
 
-export default function Option({disabeltitle,data,setData,name,placeholder,title,options=[],disabeld=false}) {
+export default function Option({error,disabeltitle,data,setData,name,placeholder,title,options=[],disabeld=false}) {
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 ">
         {/* School Selector */}
         <div>
           <label className="block text-neutral-700 mb-2">
@@ -37,7 +37,8 @@ export default function Option({disabeltitle,data,setData,name,placeholder,title
 }),
               control: (base, state) => ({
                 ...base,
-                borderColor: state.isFocused ? '#3b82f6' : '#e5e7eb',
+                
+                borderColor: state.isFocused ? '#3b82f6' :error&&error[name]?"#fb2c36":'#e5e7eb',
                 borderRadius: '0.5rem',
                 padding: '0.25rem',
                 boxShadow: state.isFocused ? '0 0 0 2px rgba(59, 130, 246, 0.1)' : 'none',
@@ -61,6 +62,7 @@ export default function Option({disabeltitle,data,setData,name,placeholder,title
               }),
             }}
           />
+        <p className='text-red-500 text-sm mx-2 mt-1'>{error&&error[name]&&error[name]}</p>
         </div>
         </div>
     );

@@ -15,10 +15,10 @@ export default function Titlepage({Icon,title,desc,add,link}) {
                          </div>
                          <p className="sm:text-sm text-xs text-neutral-600">{desc}</p>
                        </div>
-                       <Link href={link} className="bg-blue-600 text-white px-6 py-2 sm:py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+                  {add&&link&&     <Link href={link} className="bg-blue-600 text-white px-6 py-2 sm:py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
                          <PlusIcon className="w-5 h-5 " />
                          <span className="sm:text-base text-sm">{add}</span>
-                       </Link>
+                       </Link>}
                      </div>
                    </div>
                    </div>

@@ -1,93 +1,24 @@
+import { api } from "@/config/api";
+import { paymentStatus } from "@/constans/payment";
+import { grade, shiftSchool } from "@/constans/school";
 import PaymentCard from "@/ui/PaymentCard";
+import { dateformat, formatPersianDate } from "@/utils/date";
+import { formatCurrency } from "@/utils/Format";
+import { ServerErrorHadnler } from "@/utils/ServerErrorHandler";
 import { UserIcon } from "@phosphor-icons/react";
 import { Calendar, CircleWavyCheckIcon, Clock, ClockAfternoonIcon, CreditCard, Phone, User, UserCircleCheckIcon, UserCircleIcon, UsersIcon } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { Fragment } from "react";
 
-export default function page() {
+export default async function page({params}) {
 
-    const mockStudent = {
-  id: 'STU-2026-001',
-  name: 'محمد رضایی',
-  nationalId: '0123456789',
-  dateOfBirth: '1393/05/15',
-  grade: 'ششم ابتدایی',
-  school: 'دبستان شهید بهشتی',
-  shift: 'صبح',
-  address: 'تهران، خیابان ولیعصر، کوچه هفتم، پلاک 12',
-  guardianName: 'علی رضایی',
-  guardianNationalId: '9876543210',
-  fatherPhone: '09123456789',
-  motherPhone: '09121234567',
-  registrationDate: '1405/10/01',
-  status: 'active',
-};
 
-const mockPayments = [
-  {
-    id: '1',
-    date: '1405/10/15',
-    amount: 5000000,
-    type: 'شهریه مهر',
-    paymentMethod: 'کارت به کارت',
-    status: 'paid',
-    receiptNumber: 'RCP-001-1405',
-  },
-    {
-    id: '1',
-    date: '1405/10/15',
-    amount: 5000000,
-    type: 'شهریه مهر',
-    paymentMethod: 'کارت به کارت',
-    status: 'paid',
-    receiptNumber: 'RCP-001-1405',
-  },
-    {
-    id: '1',
-    date: '1405/10/15',
-    amount: 5000000,
-    type: 'شهریه مهر',
-    paymentMethod: 'کارت به کارت',
-    status: 'paid',
-    receiptNumber: 'RCP-001-1405',
-  },
-    {
-    id: '1',
-    date: '1405/10/15',
-    amount: 5000000,
-    type: 'شهریه مهر',
-    paymentMethod: 'کارت به کارت',
-    status: 'paid',
-    receiptNumber: 'RCP-001-1405',
-  },
-  {
-    id: '2',
-    date: '1405/11/10',
-    amount: 5000000,
-    type: 'شهریه آبان',
-    paymentMethod: 'واریز بانکی',
-    status: 'paid',
-    receiptNumber: 'RCP-002-1405',
-  },
-  {
-    id: '3',
-    date: '1405/12/05',
-    amount: 5000000,
-    type: 'شهریه آذر',
-    paymentMethod: 'کارت به کارت',
-    status: 'paid',
-    receiptNumber: 'RCP-003-1405',
-  },
-  {
-    id: '4',
-    date: '1406/01/01',
-    amount: 5000000,
-    type: 'شهریه دی',
-    paymentMethod: 'در انتظار پرداخت',
-    status: 'pending',
-    receiptNumber: 'RCP-004-1406',
-  },
-];
+const {id}= await params
+
+
+const res=await api.get(`student/find/${id}`).catch((err)=>ServerErrorHadnler(err))
+
+const payments=await api.get(`peyment/student/${id}`).catch((err)=>ServerErrorHadnler(err))
 
     return (
         <div className="p-3">
@@ -104,12 +35,12 @@ const mockPayments = [
             <div className="flex items-center gap-2">
               <span
                 className={`px-3 py-1 rounded-full text-sm ${
-                  mockStudent.status === 'active'
+                  !!res.data.student.active
                     ? 'bg-green-100 text-green-700'
                     : 'bg-neutral-200 text-neutral-700'
                 }`}
               >
-                {mockStudent.status === 'active' ? 'فعال' : 'غیرفعال'}
+                {!!res.data.student.active ? 'فعال' : 'غیرفعال'}
               </span>
             </div>
           </div>
@@ -131,19 +62,19 @@ const mockPayments = [
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm text-neutral-600 mb-1 block">نام و نام خانوادگی</label>
-                  <p className="text-neutral-900">{mockStudent.name}</p>
+                  <p className="text-neutral-900">{res.data.student.full_name}</p>
                 </div>
                 <div>
                   <label className="text-sm text-neutral-600 mb-1 block">کد ملی</label>
-                  <p className="text-neutral-900 font-mono text-end" dir="ltr">{mockStudent.nationalId}</p>
+                  <p className="text-neutral-900 font-mono text-end" dir="ltr">{res.data.student.nationalcode}</p>
                 </div>
                 <div>
                   <label className="text-sm text-neutral-600 mb-1 block">تاریخ تولد</label>
-                  <p className="text-neutral-900">{mockStudent.dateOfBirth}</p>
+                  <p className="text-neutral-900">{formatPersianDate(res.data.student.birthdate)}</p>
                 </div>
                 <div>
                   <label className="text-sm text-neutral-600 mb-1 block">پایه تحصیلی</label>
-                  <p className="text-neutral-900">{mockStudent.grade}</p>
+                  <p className="text-neutral-900">{grade.find((i)=>i.value==res.data.student.grade).label}</p>
                 </div>
                 {/* <div>
                   <label className="text-sm text-neutral-600 mb-1 block">شناسه دانش‌آموز</label>
@@ -151,7 +82,7 @@ const mockPayments = [
                 </div> */}
                 <div>
                   <label className="text-sm text-neutral-600 mb-1 block">تاریخ ثبت‌نام</label>
-                  <p className="text-neutral-900">{mockStudent.registrationDate}</p>
+                  <p className="text-neutral-900">{new Date(res.data.student.updatedAt).toLocaleDateString("fa-IR")}</p>
                 </div>
               </div>
             </div>
@@ -168,11 +99,11 @@ const mockPayments = [
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm text-neutral-600 mb-1 block">نام مدرسه</label>
-                  <p className="text-neutral-900">{mockStudent.school}</p>
+                  <p className="text-neutral-900">{res.data.student.school_name}</p>
                 </div>
                 <div>
                   <label className="text-sm text-neutral-600 mb-1 block">شیفت تحصیلی</label>
-                  <p className="text-neutral-900">{mockStudent.shift}</p>
+                  <p className="text-neutral-900">{shiftSchool.find((i)=>i.value==res.data.student.school_shift).label}</p>
                 </div>
               </div>
             </div>
@@ -189,7 +120,7 @@ const mockPayments = [
               <div className="space-y-6">
                 <div>
                   <label className="text-sm text-neutral-600 mb-1 block">آدرس منزل</label>
-                  <p className="text-neutral-900">{mockStudent.address}</p>
+                  <p className="text-neutral-900">{res.data.student.address}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -198,14 +129,14 @@ const mockPayments = [
                       <Phone className="w-4 h-4" />
                       شماره تماس پدر
                     </label>
-                    <p className="text-neutral-900 font-mono text-end" dir="ltr">{mockStudent.fatherPhone}</p>
+                    <p className="text-neutral-900 font-mono text-end" dir="ltr">{res.data.student.father_phone}</p>
                   </div>
                   <div>
                     <label className="text-sm text-neutral-600 mb-1 block flex items-center gap-2">
                       <Phone className="w-4 h-4" />
                       شماره تماس مادر
                     </label>
-                    <p className="text-neutral-900 font-mono text-end" dir="ltr">{mockStudent.motherPhone}</p>
+                    <p className="text-neutral-900 font-mono text-end" dir="ltr">{res.data.student.mother_phone}</p>
                   </div>
                 </div>
               </div>
@@ -225,11 +156,11 @@ const mockPayments = [
               <div className="space-y-4">
                 <div>
                   <label className="text-sm text-neutral-600 mb-1 block">نام ولی</label>
-                  <p className="text-neutral-900">{mockStudent.guardianName}</p>
+                  <p className="text-neutral-900">{res.data.student.guardian_fullname}</p>
                 </div>
                 <div>
                   <label className="text-sm text-neutral-600 mb-1 block">کد ملی ولی</label>
-                  <p className="text-neutral-900 font-mono text-end" dir="ltr">{mockStudent.guardianNationalId}</p>
+                  <p className="text-neutral-900 font-mono text-end" dir="ltr">{res.data.student.guardian_nationalcode}</p>
                 </div>
               </div>
             </div>
@@ -253,47 +184,33 @@ const mockPayments = [
                   <tr className="border-b border-neutral-200 bg-white md:text-sm lg:text-base">
                     <th className=" py-3 px-4 text-neutral-700">تاریخ</th>
                     <th className=" py-3 px-4 text-neutral-700">نوع پرداخت</th>
-                    <th className=" py-3 px-4 text-neutral-700">مبلغ</th>
-                    <th className=" py-3 px-4 text-neutral-700">روش پرداخت</th>
                     <th className=" py-3 px-4 text-neutral-700">وضعیت</th>
+                    <th className=" py-3 px-4 text-neutral-700">مبلغ</th>
                     <th className=" py-3 px-4 text-neutral-700">عملیات</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {mockPayments.reverse().map((payment) => (
+                  {payments.data.payments.reverse().map((payment) => (
                     <tr key={payment.id} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors md:text-sm lg:text-base">
                    
-                      <td className="py-4 px-4 text-neutral-700 flex items-center ">
+                      <td className="py-4 px-4 text-neutral-700 flex items-center text-center">
                      
-                        {payment.date}
+                        {new Date(payment.createdAt).toLocaleDateString("fa-IR")}
                       </td>
-                      <td className="py-4 px-4 text-neutral-900">{payment.type}</td>
-                      <td className="py-4 px-4 text-neutral-900">20،000،000</td>
-                      <td className="py-4 px-4 text-neutral-700">{payment.paymentMethod}</td>
-                      <td className="py-4 px-4">
-                        <span
-                          className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${
-                            payment.status === 'paid'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-amber-100 text-amber-700'
-                          }`}
-                        >
-                          {payment.status === 'paid' ? (
-                            <>
-                              <CircleWavyCheckIcon className="w-4 h-4" />
-                              پرداخت شده
-                            </>
-                          ) : (
-                            <>
-                              <Clock className="w-4 h-4" />
-                              در انتظار
-                            </>
-                          )}
+                      <td className="py-4 px-4 text-neutral-700">
+                    {payment.title}
+                      </td>
+                      <td className=" text-neutral-900">
+                        <span className={` ${paymentStatus.find((i)=>i.value==payment.status).style} rounded-full text-white py-1 px-1`}>
+
+                        {paymentStatus.find((i)=>i.value==payment.status).label}
                         </span>
-                      </td>
+                        </td>
+                      <td className="py-4 px-4 text-neutral-900">{formatCurrency(payment.amount)}</td>
+                      
                          <td className="py-4 px-4 text-blue-600 justify-center items-center font-semibold flex flex-row gap-x-4" dir="ltr">
                        {payment.status !== 'paid'&& <Link className="text-blue-600 font-semibold" href={'/'}>پرداخت</Link>}
-                     <Link className="text-blue-600 font-semibold" href={'/Panel/2/1'}>مشاهده</Link>
+                     <Link className="text-blue-600 font-semibold" href={`/Panel/${id}/${payment.id}`}>مشاهده</Link>
                       </td>
                     </tr>
                   ))}
@@ -301,7 +218,7 @@ const mockPayments = [
               </table>
             </div>
                  <div className="md:hidden space-y-4 ">
-              {mockPayments.map((payment) => (
+              {payments.data.payments.map((payment) => (
                 <Fragment key={payment.id}>
 
            <PaymentCard payment={payment} />

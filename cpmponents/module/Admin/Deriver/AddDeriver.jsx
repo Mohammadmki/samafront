@@ -1,24 +1,79 @@
 'use client'
 
+import { api } from "@/config/api";
+import { cartype, Palte } from "@/constans/deriver";
 import FormInput from "@/ui/FormInput";
 import Input from "@/ui/Input";
+import Map from "@/ui/Map";
 import Option from "@/ui/Option";
-import { useState } from "react";
+import TextareaInput from "@/ui/TextareaInput";
+import { ClientError } from "@/utils/ClientrrorHandler";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-export default function AddDeriver() {
+export default function AddDeriver({data}) {
 
-    const [data,setdata]=useState({
-        school:"",
-        car:""
+const [loading,setLoading]=useState(false)
+
+    const [deriver,setDeriver]=useState({
+        full_name:"",
+        phone:"",
+        plate_part1:"",
+        plate_letter:"",
+        plate_part2:"",
+        plate_city_code:"",
+        file_number:"",
+        car_type:"",
+        account_number:"",
+        card_number:"",
+        futher_name:"",
+        address:"",
+        lat:null,
+        lng:null
     })
 
-     const options = [
-        { value: 'shahid_beheshti', label: 'دبستان شهید بهشتی' },
-        { value: 'ferdowsi', label: 'دبستان فردوسی' },
-        { value: 'motahhari', label: 'دبستان مطهری' },
-        { value: 'khayyam', label: 'دبستان خیام' },
-        { value: 'saadi', label: 'دبستان سعدی' },
-      ];
+    useEffect(()=>{
+      if(data){
+          setDeriver(data)
+      }
+    },[data])
+
+    const [error,setError]=useState(null)
+
+    const pathname=usePathname()
+
+    const router=useRouter()
+
+    const addHandler=async()=>{
+        setLoading(true)
+        const res=await api.post("/deriver/add",{...deriver}).catch(err=>ClientError(err,setError)).finally(()=>setLoading(false))
+   if(res.status==200){
+    toast.success("راننده با موفقیت اضافه شد")
+if(pathname.includes('Admin')){
+    router.push("/Admin/Deriver")
+}else{
+    router.push('Panel')
+}
+   }
+    }
+
+         const selectLoc=(value)=>{
+        setDeriver((prev)=>({...prev,lat:value.lat,lng:value.lng}))
+      }
+
+
+      const updateHandler=async()=>{
+        if(!data) return
+
+        const res=await api.put(`/deriver/update/${data.id}`,{...deriver}).catch(err=>ClientError(err,setError))
+
+        if(res.status==200){
+            toast.success("راننده با موفقیت ویرایش شد")
+            router.back()
+        }
+
+      }
 
     return (
         <div className="bg-neutral-50 p-6 md:p-8 mx-auto  rounded-xl shadow-sm border border-neutral-200  text-black">
@@ -30,8 +85,9 @@ export default function AddDeriver() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-5">
 
-            <FormInput data={data} setData={setdata} label={"نام"} placeholder="نام کامل خود را وارد کنید" name={"name"}  />
-           <FormInput data={data} setData={setdata} label={"شماره تلفن"} placeholder="شماره تلفن خود را وارد کنید" name={"phone"} type={"number"}  />
+            <FormInput error={error} data={deriver} setData={setDeriver} label={"نام"} placeholder="نام کامل خود را وارد کنید" name={"full_name"}  />
+            <FormInput error={error} data={deriver} setData={setDeriver} label={"نام پدر"} placeholder="نام پدر را وارد کنید" name={"futher_name"}  />
+           <FormInput error={error} data={deriver} setData={setDeriver} label={"شماره تلفن"} placeholder="شماره تلفن خود را وارد کنید" name={"phone"} type={"number"}  />
          <div>
 <p className="mb-1 px-2 sm:text-base text-sm">
     شماره پلاک
@@ -39,36 +95,35 @@ export default function AddDeriver() {
 <div className="flex flex-row items-center gap-x-2">
 <div className="w-fit max-w-18">
 
-           <FormInput data={data} setData={setdata} label={""} placeholder="45" name={"nationalId"} type={"number"}  />
+           <FormInput error={error} data={deriver} setData={setDeriver} label={""} placeholder="45" name={"plate_part1"} type={"number"}  />
 </div>
-      <select
-
-                    className="appearance-none px-2 py-1.5 pl-0 sm:pl-7 sm:text-base text-xs border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-neutral-900 cursor-pointer w-fit "
-                  >
-                    <option value="name">ب</option>
-                    <option value="father">ص</option>
-                    <option value="mother">ج</option>
-                    
-                  </select>
+   <Option error={error} data={deriver} setData={setDeriver} name={"plate_letter"} placeholder={"ب"} options={Palte}  />
                   <div className="max-w-28">
 
-                  <FormInput data={data} setData={setdata} label={""} placeholder="525" name={"nationalId"} type={"text"}  />
+                  <FormInput error={error} data={deriver} setData={setDeriver} label={""} placeholder="525" name={"plate_part2"} type={"number"}  />
                   </div>
                   <div className="max-w-20">
 
-                  <FormInput data={data} setData={setdata} label={""} placeholder="ایران 47" name={"nationalId"} type={"text"} />
+                  <FormInput error={error} data={deriver} setData={setDeriver} label={""} placeholder="ایران 47" name={"plate_city_code"} type={"number"} />
                   </div>
 </div>
          </div>
-           <FormInput data={data} setData={setdata} label={"شماره پرونده"} placeholder="شماره پرونده خود را وارد کنید" name={"nationalId"} type={"number"}  />
-                  <Option data={data} setData={setdata} name={"sachool"} placeholder={"نام مدرسه را انتخاب کنید"} title={"نام مدرسه"} options={options} />
-                            <Option data={data} setData={setdata} name={"car"} placeholder={"نوع خودرو را انتخاب کنید"} title={"نوع خودرو"} options={[{value:"1",label:"سواری"},{value:"2",label:"ون"}]} />
-            <FormInput  data={data} setData={setdata} label={"شماره حساب"} placeholder="شماره حساب خود را وارد کنید" name={"nationalId"} type={"number"} />
-                     <FormInput  data={data} setData={setdata} label={"شماره کارت"} placeholder="شماره کارت خود را وارد کنید" name={"nationalId"} type={"number"} />
+          {pathname.includes("Admin")&& <FormInput error={error} data={deriver} setData={setDeriver} label={"شماره پرونده"} placeholder="شماره پرونده خود را وارد کنید" name={"file_number"} type={"number"}  />}
+                            <Option error={error} data={deriver} setData={setDeriver} name={"car_type"} placeholder={"نوع خودرو را انتخاب کنید"} title={"نوع خودرو"} options={cartype} />
+            <FormInput error={error}  data={deriver} setData={setDeriver} label={"شماره حساب"} placeholder="شماره حساب خود را وارد کنید" name={"account_number"} type={"number"} />
+                     <FormInput error={error}  data={deriver} setData={setDeriver} label={"شماره کارت"} placeholder="شماره کارت خود را وارد کنید" name={"card_number"} type={"number"} />
+         <div className="col-span-full">
+            <TextareaInput data={deriver} setData={setDeriver} error={error} label={"آدرس"} name={"address"} placeholder="آدرس کامل خود را وارد کنید" />
+
+          <Map value={deriver} onChange={selectLoc} />
+         </div>
             </div>
-       <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mt-5 w-full">
+ {!data&&      <button disabled={loading} onClick={addHandler} className="bg-blue-500 disabled:opacity-50 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mt-5 w-full">
         ثبت راننده
-       </button>
+       </button>}
+       {data&&  <button disabled={loading} onClick={updateHandler} className="bg-blue-500 disabled:opacity-50 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mt-5 w-full">
+        ثبت راننده
+       </button>}
         </div>
     );
 }

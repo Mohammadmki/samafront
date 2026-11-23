@@ -3,16 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
+    "axios": "^1.13.6",
+    "js-cookie": "^3.0.5",
     "next": "16.1.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-hot-toast": "^2.6.0",
     "react-leaflet": "^5.0.0-rc.2",
     "react-multi-date-picker": "^4.5.2",
     "react-select": "^5.10.2"
