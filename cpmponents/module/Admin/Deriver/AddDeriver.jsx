@@ -3,14 +3,22 @@
 import { api } from "@/config/api";
 import { cartype, Palte } from "@/constans/deriver";
 import FormInput from "@/ui/FormInput";
-import Input from "@/ui/Input";
-import Map from "@/ui/Map";
 import Option from "@/ui/Option";
 import TextareaInput from "@/ui/TextareaInput";
 import { ClientError } from "@/utils/ClientrrorHandler";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
+import dynamic from 'next/dynamic';
+
+const Map = dynamic(
+    () => import('@/ui/Map'),
+    {
+      ssr: false,
+      loading: () => <p>در حال بارگذاری...</p>,
+    }
+  );
 
 export default function AddDeriver({data}) {
 

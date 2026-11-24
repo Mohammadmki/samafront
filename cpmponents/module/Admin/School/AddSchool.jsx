@@ -2,7 +2,6 @@
 import { api } from "@/config/api";
 import { educationLevel, grade, shiftSchool } from "@/constans/school";
 import FormInput from "@/ui/FormInput";
-import Map from "@/ui/Map";
 import Option from "@/ui/Option";
 import TextareaInput from "@/ui/TextareaInput";
 import { ClientError } from "@/utils/ClientrrorHandler";
@@ -10,6 +9,15 @@ import { setLocation } from "@/utils/setLocation";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import dynamic from 'next/dynamic';
+
+const Map = dynamic(
+    () => import('@/ui/Map'),
+    {
+      ssr: false,
+      loading: () => <p>در حال بارگذاری...</p>,
+    }
+  );
 
 export default function AddSchool({school,id}) {
 

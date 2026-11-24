@@ -1,10 +1,24 @@
 'use client'
 
-import SelectStep from "@/cpmponents/module/panel/SelectStep";
-import Information from "@/cpmponents/module/student/Information";
-import Option from "@/ui/Option";
 import { useEffect, useState } from "react";
-import ContractSigned from "./ContractSigned";
+
+import dynamic from 'next/dynamic';
+
+const Information = dynamic(
+    () => import('@/cpmponents/module/student/Information'),
+    {
+      ssr: false,
+      loading: () => <p>در حال بارگذاری...</p>,
+    }
+  );
+
+  const ContractSigned = dynamic(
+    () => import('./ContractSigned'),
+    {
+      ssr: false,
+      loading: () => <p>در حال بارگذاری...</p>,
+    }
+  );
 
 export default function EditPage({data}) {
 

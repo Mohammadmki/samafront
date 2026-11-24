@@ -5,6 +5,8 @@ import { PlusCircleIcon, PlusIcon } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { Fragment } from "react";
 
+
+export const dynamic = "force-dynamic";
 export default async function page() {
 
   const res=await api.get("/student").catch(err=>ServerErrorHadnler(err))

@@ -4,13 +4,15 @@ import UploadFile from "@/cpmponents/module/Admin/Settings/UploadFile";
 import Titlepage from "@/ui/Titlepage";
 import { ServerErrorHadnler } from "@/utils/ServerErrorHandler";
 import { GearIcon } from "@phosphor-icons/react/dist/ssr";
-import { Adamina } from "next/font/google";
+
+
+
+export const dynamic = "force-dynamic";
 
 export default async function page() {
 
 const res=await api.get("settings/admins").catch(err=>ServerErrorHadnler(err))
 
-console.log(res)
 
     return (
         <div>
